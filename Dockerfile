@@ -31,8 +31,9 @@ RUN cd /src/llama.cpp && \
 
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
+# libcurl：LLAMA_CURL 需要；libgomp1：OpenMP 运行库，基础镜像未自带
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libcurl4 && \
+    apt-get install -y --no-install-recommends libcurl4 libgomp1 && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/llama.cpp/build/bin/llama-server /usr/local/bin/
