@@ -1,0 +1,40 @@
+name: build-llama-server
+
+on:
+  workflow_dispatch:
+    inputs:
+      llama_version:
+        description: 'llama.cpp tag（如 b11588）'
+        required: false
+        default: 'b11588'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image (native linux/amd64)
+        env:
+          LLAMA_VERSION: ${{ github.event.inputs.llama_version || 'b11588' }}
+        run: |
+          docker build \
+            --build-arg LLAMA_VERSION=$LLAMA_VERSION \
+            -t llama-server:$LLAMA_VERSION .
+
+      - name: Export image
+        env:
+          LLAMA_VERSION: ${{ github.event.inputs.llama_version || 'b11588' }}
+        run: |
+          docker save llama-server:$LLAMA_VERSION | gzip > llama-server_$LLAMA_VERSION.tar.gz
+          ls -lh llama-server_$LLAMA_VERSION.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-server-image
+          path: llama-server_*.tar.gz
+          retention-days: 7
+          compression-level: 0
