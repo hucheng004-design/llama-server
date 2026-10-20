@@ -23,7 +23,10 @@ RUN cd /src/llama.cpp && \
     cmake -B build \
       -DGGML_CUDA=ON \
       -DCMAKE_CUDA_ARCHITECTURES="86" \
-      -DCMAKE_BUILD_TYPE=Release && \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DLLAMA_BUILD_TESTS=OFF \
+      -DLLAMA_BUILD_EXAMPLES=OFF && \
     cmake --build build --config Release -j4
 
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
